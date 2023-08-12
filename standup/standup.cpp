@@ -29,7 +29,8 @@ auto getFirstTime(int interval) {
 	auto now = getNow();
 
 	auto nextTime = floor<hours>(now) + minutes(interval);
-	while (nextTime <= now) {
+	while (nextTime <= now)
+	{
 		nextTime += minutes(interval);
 	}
 
@@ -38,9 +39,7 @@ auto getFirstTime(int interval) {
 
 void popup(const std::wstring& title, const std::wstring& message, const std::wstring& imagePath, WinToastTemplate::Duration duration, IWinToastHandler* handler)
 {
-	WinToastTemplate templ;
-	templ = WinToastTemplate(WinToastTemplate::ImageAndText02);
-
+	WinToastTemplate templ(WinToastTemplate::ImageAndText02);
 	templ.setTextField(title, WinToastTemplate::FirstLine);
 	templ.setTextField(message, WinToastTemplate::SecondLine);
 	templ.setImagePath(imagePath);
@@ -49,7 +48,7 @@ void popup(const std::wstring& title, const std::wstring& message, const std::ws
 	WinToast::WinToastError error;
 	if (WinToast::instance()->showToast(templ, handler, &error) < 0)
 	{
-		std::wcout << L"Could not launch your toast notification: " << error << std::endl;
+		std::wcout << L"Error showing toast: " << error << std::endl;
 	}
 }
 
@@ -70,14 +69,15 @@ int main(int argc, char* argv[])
 	const auto aumi = WinToast::configureAUMI(L"standup", L"standup", L"standup", L"20230812");
 	WinToast::instance()->setAppUserModelId(aumi);
 
-	if (!WinToast::instance()->initialize(&error)) {
+	if (!WinToast::instance()->initialize(&error))
+	{
 		wchar_t buf[250];
 		swprintf_s(buf, L"Failed to initialize WinToast :%d", error);
 		std::wcout << buf << std::endl;
 	}
 	auto handler = new MyWinToastHandler();
 
-	// Prepare main loop
+	// Main app logic
 	int interval = argc > 1 ? std::stoi(argv[1]) : 60;
 
 	auto nextTime = getFirstTime(interval);
@@ -91,7 +91,8 @@ int main(int argc, char* argv[])
 
 	while (true)
 	{
-		if (getNow() >= nextTime) {
+		if (getNow() >= nextTime)
+		{
 			auto thisTime = nextTime;
 			nextTime += minutes(interval);
 			popup(L"Stand up!",

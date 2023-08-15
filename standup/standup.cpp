@@ -37,7 +37,7 @@ auto getFirstTime(int interval) {
 	return nextTime;
 }
 
-void popup(const std::wstring& title, const std::wstring& message, const std::wstring& imagePath, WinToastTemplate::Duration duration, IWinToastHandler* handler)
+void popup(const std::wstring& title, const std::wstring& message, const std::wstring& imagePath, WinToastTemplate::Duration duration)
 {
 	WinToastTemplate templ(WinToastTemplate::ImageAndText02);
 	templ.setTextField(title, WinToastTemplate::FirstLine);
@@ -45,6 +45,7 @@ void popup(const std::wstring& title, const std::wstring& message, const std::ws
 	templ.setImagePath(imagePath);
 	templ.setDuration(duration);
 
+	auto handler = new MyWinToastHandler();
 	WinToast::WinToastError error;
 	if (WinToast::instance()->showToast(templ, handler, &error) < 0)
 	{
@@ -75,7 +76,6 @@ int main(int argc, char* argv[])
 		swprintf_s(buf, L"Failed to initialize WinToast :%d", error);
 		std::wcout << buf << std::endl;
 	}
-	auto handler = new MyWinToastHandler();
 
 	// Main app logic
 	int interval = argc > 1 ? std::stoi(argv[1]) : 60;
@@ -85,8 +85,7 @@ int main(int argc, char* argv[])
 	popup(L"standup started!",
 		std::format(L"Reminding every {} minutes. Next: {:%H:%M}", interval, nextTime),
 		imagePath,
-		WinToastTemplate::Duration::Short,
-		handler
+		WinToastTemplate::Duration::Short
 	);
 
 	while (true)
@@ -98,8 +97,7 @@ int main(int argc, char* argv[])
 			popup(L"Stand up!",
 				std::format(L"It's {:%H:%M}! Stand up, walk around and stretch for a while!", thisTime),
 				imagePath,
-				WinToastTemplate::Duration::Long,
-				handler
+				WinToastTemplate::Duration::Long
 			);
 		}
 		std::this_thread::sleep_for(seconds(5));
